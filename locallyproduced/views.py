@@ -1,6 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from locallyproduced.models import Producer
 
 # Create your views here.
 def show(request):
-    return HttpResponse('Hello')
+    return render(request,
+           'locallyproduced/producers.html',
+           {'producers': Producer.objects.all()})
