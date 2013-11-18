@@ -7,3 +7,6 @@ class Producer(models.Model):
     name = models.CharField(max_length=30)
     location = models.CharField(max_length=30)
     url = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
