@@ -8,5 +8,5 @@ class Producer(models.Model):
     location = models.CharField(max_length=30)
     url = models.CharField(max_length=100)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
