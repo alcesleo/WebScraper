@@ -1,39 +1,55 @@
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
+from urlparse import urljoin
+# from locallyproduced.models import Producer
 
 class Scraper(object):
 
-    # Define vars
-    base_url = 'http://vhost3.lnu.se:20080/~1dv449/scrape/'
-    login_url = base_url + 'check.php'
-    product_url = base_url + 'secure/producenter.php'
+    def __init__(self):
 
-    login_data = {
-        'username': 'admin',
-        'password': 'admin'
-    }
+        # define URL:s
+        self.base_url = 'http://vhost3.lnu.se:20080/~1dv449/scrape/'
+        self.login_url = self.base_url + 'check.php'
+        self.product_url = self.base_url + 'secure/producenter.php'
 
-    def get_logged_in_session(self):
+        self.session = self.get_logged_in_session({'username': 'admin', 'password': 'admin'})
+
+    def get_logged_in_session(self, login_data):
         """Returns requests session-object"""
 
-        # Log in
+        # log in
         s = requests.session()
-        s.post(self.login_url, data=self.login_data)
+        s.post(self.login_url, data=login_data)
         return s
 
     def scrape(self):
 
-        s = self.get_logged_in_session()
+        # get and parse the main page
+        response = self.session.get(self.product_url)
+        soup = BeautifulSoup(response.text, parse_only=SoupStrainer('table'))
 
-        # Scrape
-        response = s.get(self.product_url)
-        soup = BeautifulSoup(response.text)
-        soup.encode('utf-8')
-        links = ''
-        for link in soup.find_all('a'):
-            print(link)
+        # remove the annoying thead
+        soup.table.thead.extract()
+
+        # parse each row
+        for row in soup.find_all('tr'):
+            self.parse_row(row)
+
+    def parse_row(self, row):
+
+        # link is in first td
+        link = row.td.a
+        if link.has_attr('href'):
+            href = link['href']
+            self.parse_details_page(href)
 
 
-# Test
+    def parse_details_page(self, href):
+        # get full link
+        link = urljoin(self.product_url, href)
+        print(link)
+
+
+
 s = Scraper()
 s.scrape()
