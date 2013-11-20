@@ -1,20 +1,37 @@
-<table>
-    <thead>
-        <tr>
-            <td>ID</td>
-            <td>Name</td>
-            <td>Location</td>
-            <td>URL</td>
-        </tr>
-    </thead>
-    <tbody>
-        {% for producer in producers %}
-        <tr>
-            <td>{{ producer.producer_id}}</td>
-            <td>{{ producer.name }}</td>
-            <td>{{ producer.location}}</td>
-            <td>{{ producer.url}}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scraped producers</title>
+    <meta charset="utf-8">
+    <style>
+    #wrapper {
+        width: 700px;
+        margin: 0 auto;
+    }
+    </style>
+</head>
+<body>
+<div id="wrapper">
+    <table>
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Name</td>
+                <td>Location</td>
+                <td>URL</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producer in producers %}
+            <tr>
+                <td>{{ producer.producer_id }}</td>
+                <td>{{ producer.name }}</td>
+                <td>{{ producer.location }}</td>
+                <td>{{ producer.url }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
