@@ -85,8 +85,8 @@ class Scraper(object):
         try:
             html = self.get_html(details_link)
         except Exception, e:
-            producer.url = '404'
-            producer.location = '404'
+            producer.url = 'Details page: 404'
+            producer.location = 'Details page: 404'
         else:
             self.parse_details_page(html, producer)
 
@@ -105,3 +105,10 @@ class Scraper(object):
             location = location_tag.string[5:].capitalize()
             producer.location = location
 
+        # get url
+        p_tag = soup.find(text=re.compile(r'Hemsida:'))
+        link = p_tag.find_next_sibling('a')
+        if link and link['href'] != '#':
+            producer.url = link['href']
+        else:
+            producer.url = 'Not provided'
