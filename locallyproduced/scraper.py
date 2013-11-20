@@ -19,34 +19,45 @@ class Scraper(object):
 
     def get_logged_in_session(self, login_data):
         """Returns requests session-object"""
-
         # log in
         s = requests.session()
         s.post(self.login_url, data=login_data)
         return s
+
+    def get_html(self, url):
+        """Returns correctly encoded html of url"""
+        response = self.session.get(url)
+        return response.text.encode('latin-1', 'ignore')
 
     def empty_database(self):
         """Delete all rows in db"""
         Producer.objects.all().delete()
 
     def scrape(self):
+        """Scrapes the page"""
 
         # clear the table
         self.empty_database()
 
-        # get and parse the table portion of the page
-        response = self.session.get(self.product_url)
-        # TODO: Fix encoding, should probably be set to utf-8 once the head-tag is in place
-        soup = BeautifulSoup(response.text.encode('latin-1', 'ignore'), parse_only=SoupStrainer('table'))
+        # parse the html
+        html = self.get_html(self.product_url)
+        self.parse_main_page(html)
+
+    def parse_main_page(self, html):
+        """Parses the main list of producers"""
+
+        soup = BeautifulSoup(html, parse_only=SoupStrainer('table'))
 
         # remove the annoying thead
         soup.table.thead.extract()
 
         # parse each row
         for row in soup.find_all('tr'):
-            self.parse_row(row)
+            self.parse_producer(row)
 
-    def parse_row(self, row):
+
+    def parse_producer(self, row):
+        """Parses a table row containing a Producer and saves it to the db"""
 
         producer = Producer()
 
@@ -57,24 +68,25 @@ class Scraper(object):
         producer.name = link.string.strip()
 
         # href
-        if link.has_attr('href'):
-            href = link['href']
+        href = link['href']
 
-            # get the id
-            match = re.search('producent_(\d+)\.php', href)
-            if match:
-                print int(match.group(1))
-                producer.producer_id = int(match.group(1))
-            else:
-                producer.producer_id = -1
+        # get the id
+        match = re.search('producent_(\d+)\.php', href)
+        if match:
+            print int(match.group(1))
+            producer.producer_id = int(match.group(1))
 
-            # go to details page
-            self.parse_details_page(href)
+        # go to details page
+        details_link = urljoin(self.product_url, href)
+        html = self.get_html(details_link)
+        self.parse_details_page(html, producer)
 
         producer.save()
 
 
-    def parse_details_page(self, href):
-        # get full link
-        link = urljoin(self.product_url, href)
-        print(link)
+    def parse_details_page(self, html, producer):
+        """Updates supplied producer with data from details page"""
+
+        soup = BeautifulSoup(html)
+
+
