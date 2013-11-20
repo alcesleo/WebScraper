@@ -1,5 +1,6 @@
 import requests
 import re
+import time
 from bs4 import BeautifulSoup, SoupStrainer
 from urlparse import urljoin
 from locallyproduced.models import Producer
@@ -25,7 +26,9 @@ class Scraper(object):
         return s
 
     def get_html(self, url):
-        """Returns correctly encoded html of url, throws on 404"""
+        """Returns correctly encoded html of url, throws on 404.
+            Also delays the request to not overcumber the server."""
+        time.sleep(0.2)
         response = self.session.get(url)
         response.raise_for_status()
         return response.text.encode('latin-1', 'ignore')
