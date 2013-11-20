@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup, SoupStrainer
 from urlparse import urljoin
-# from locallyproduced.models import Producer
+from locallyproduced.models import Producer
 
 class Scraper(object):
 
@@ -12,7 +12,9 @@ class Scraper(object):
         self.login_url = self.base_url + 'check.php'
         self.product_url = self.base_url + 'secure/producenter.php'
 
-        self.session = self.get_logged_in_session({'username': 'admin', 'password': 'admin'})
+        # log in
+        credentials = {'username': 'admin', 'password': 'admin'}
+        self.session = self.get_logged_in_session(credentials)
 
     def get_logged_in_session(self, login_data):
         """Returns requests session-object"""
@@ -24,7 +26,7 @@ class Scraper(object):
 
     def scrape(self):
 
-        # get and parse the main page
+        # get and parse the table portion of the page
         response = self.session.get(self.product_url)
         soup = BeautifulSoup(response.text, parse_only=SoupStrainer('table'))
 
@@ -48,8 +50,3 @@ class Scraper(object):
         # get full link
         link = urljoin(self.product_url, href)
         print(link)
-
-
-
-s = Scraper()
-s.scrape()
