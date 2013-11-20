@@ -27,6 +27,7 @@ class Scraper(object):
     def get_html(self, url):
         """Returns correctly encoded html of url"""
         response = self.session.get(url)
+        # TODO: Handle 404
         return response.text.encode('latin-1', 'ignore')
 
     def empty_database(self):
@@ -73,7 +74,6 @@ class Scraper(object):
         # get the id
         match = re.search('producent_(\d+)\.php', href)
         if match:
-            print int(match.group(1))
             producer.producer_id = int(match.group(1))
 
         # go to details page
@@ -89,4 +89,10 @@ class Scraper(object):
 
         soup = BeautifulSoup(html)
 
+        # get location
+        location_tag = soup.find('span', {'class': 'ort'})
+        if location_tag:
+            # remove 'Ort: ' and fix case
+            location = location_tag.string[5:].capitalize()
+            producer.location = location
 
