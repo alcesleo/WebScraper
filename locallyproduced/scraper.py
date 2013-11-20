@@ -44,7 +44,6 @@ class Scraper(object):
         try:
             html = self.get_html(self.product_url)
         except Exception, e:
-            # TODO: handle 404
             pass
         else:
             self.parse_main_page(html)
@@ -77,7 +76,7 @@ class Scraper(object):
         href = link['href']
 
         # get the id
-        match = re.search('producent_(\d+)\.php', href)
+        match = re.search(r'producent_(\d+)\.php', href)
         if match:
             producer.producer_id = int(match.group(1))
 
@@ -86,8 +85,8 @@ class Scraper(object):
         try:
             html = self.get_html(details_link)
         except Exception, e:
-            # TODO: handle 404
-            pass
+            producer.url = '404'
+            producer.location = '404'
         else:
             self.parse_details_page(html, producer)
 
