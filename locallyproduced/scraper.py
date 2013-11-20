@@ -25,9 +25,9 @@ class Scraper(object):
         return s
 
     def get_html(self, url):
-        """Returns correctly encoded html of url"""
+        """Returns correctly encoded html of url, throws on 404"""
         response = self.session.get(url)
-        # TODO: Handle 404
+        response.raise_for_status()
         return response.text.encode('latin-1', 'ignore')
 
     def empty_database(self):
@@ -41,8 +41,13 @@ class Scraper(object):
         self.empty_database()
 
         # parse the html
-        html = self.get_html(self.product_url)
-        self.parse_main_page(html)
+        try:
+            html = self.get_html(self.product_url)
+        except Exception, e:
+            # TODO: handle 404
+            pass
+        else:
+            self.parse_main_page(html)
 
     def parse_main_page(self, html):
         """Parses the main list of producers"""
@@ -78,8 +83,13 @@ class Scraper(object):
 
         # go to details page
         details_link = urljoin(self.product_url, href)
-        html = self.get_html(details_link)
-        self.parse_details_page(html, producer)
+        try:
+            html = self.get_html(details_link)
+        except Exception, e:
+            # TODO: handle 404
+            pass
+        else:
+            self.parse_details_page(html, producer)
 
         producer.save()
 
