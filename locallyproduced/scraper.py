@@ -61,7 +61,7 @@ class Scraper(object):
             href = link['href']
 
             # get the id
-            match = re.search('producer_(\d.)', href)
+            match = re.search('producent_(\d+)\.php', href)
             if match:
                 print int(match.group(1))
                 producer.producer_id = int(match.group(1))
