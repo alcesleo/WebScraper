@@ -1,4 +1,5 @@
 import requests
+import re
 from bs4 import BeautifulSoup, SoupStrainer
 from urlparse import urljoin
 from locallyproduced.models import Producer
@@ -24,14 +25,23 @@ class Scraper(object):
         s.post(self.login_url, data=login_data)
         return s
 
+    def empty_database(self):
+        """Delete all rows in db"""
+        Producer.objects.all().delete()
+
     def scrape(self):
+
+        # clear the table
+        self.empty_database()
 
         # get and parse the table portion of the page
         response = self.session.get(self.product_url)
-        soup = BeautifulSoup(response.text, parse_only=SoupStrainer('table'))
+        # TODO: Fix encoding
+        soup = BeautifulSoup(response.text.encode('utf-8', 'ignore'), parse_only=SoupStrainer('table'))
 
         # remove the annoying thead
         soup.table.thead.extract()
+
 
         # parse each row
         for row in soup.find_all('tr'):
@@ -39,11 +49,30 @@ class Scraper(object):
 
     def parse_row(self, row):
 
+        producer = Producer()
+
         # link is in first td
         link = row.td.a
+
+        # get the name
+        producer.name = link.string.strip()
+
+        # href
         if link.has_attr('href'):
             href = link['href']
+
+            # get the id
+            match = re.search('producer_(\d.)', href)
+            if match:
+                print int(match.group(1))
+                producer.producer_id = int(match.group(1))
+            else:
+                producer.producer_id = -1
+
+            # go to details page
             self.parse_details_page(href)
+
+        producer.save()
 
 
     def parse_details_page(self, href):
