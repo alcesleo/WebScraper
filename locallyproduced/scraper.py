@@ -36,12 +36,11 @@ class Scraper(object):
 
         # get and parse the table portion of the page
         response = self.session.get(self.product_url)
-        # TODO: Fix encoding
-        soup = BeautifulSoup(response.text.encode('utf-8', 'ignore'), parse_only=SoupStrainer('table'))
+        # TODO: Fix encoding, should probably be set to utf-8 once the head-tag is in place
+        soup = BeautifulSoup(response.text.encode('latin-1', 'ignore'), parse_only=SoupStrainer('table'))
 
         # remove the annoying thead
         soup.table.thead.extract()
-
 
         # parse each row
         for row in soup.find_all('tr'):
