@@ -8,6 +8,27 @@
         width: 700px;
         margin: 0 auto;
     }
+    body {
+        font: 15px Georgia, Serif;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    tr:nth-of-type(odd) {
+        background: #eee;
+    }
+    th {
+        background: #333;
+        color: white;
+        font-weight: bold;
+    }
+    td,
+    th {
+        padding: 5px;
+        border: 1px solid #ccc;
+        text-align: left;
+    }
     </style>
 </head>
 <body>
@@ -15,10 +36,10 @@
     <table>
         <thead>
             <tr>
-                <td>ID</td>
-                <td>Name</td>
-                <td>Location</td>
-                <td>URL</td>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>URL</th>
             </tr>
         </thead>
         <tbody>
