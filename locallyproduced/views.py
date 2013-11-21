@@ -13,4 +13,4 @@ def scrape(request):
     """Scrape the site, then redirect to show db"""
     s = Scraper()
     s.scrape()
-    return redirect('show')
+    return redirect('locallyproduced.views.show')
