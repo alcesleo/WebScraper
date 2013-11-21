@@ -27,10 +27,19 @@ class Scraper(object):
 
     def get_html(self, url):
         """Returns correctly encoded html of url, throws on 404.
-            Also delays the request to not overcumber the server."""
+            Also delays the request to not overcumber the server,
+            and sets appropriate headers."""
+
+        # delay to be nice to the server
         time.sleep(0.2)
-        response = self.session.get(url)
-        response.raise_for_status()
+
+        headers = {
+            'User-Agent': 'Homecooked webscraper',
+            'From': 'youremail@mail.com'
+        }
+
+        response = self.session.get(url, headers=headers)
+        response.raise_for_status() # throws an error or 404, 500 etc...
         return response.text.encode('latin-1', 'ignore')
 
     def empty_database(self):
